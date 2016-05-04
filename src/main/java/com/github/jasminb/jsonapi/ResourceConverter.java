@@ -10,6 +10,8 @@ import com.github.jasminb.jsonapi.annotations.Id;
 import com.github.jasminb.jsonapi.annotations.Meta;
 import com.github.jasminb.jsonapi.annotations.Relationship;
 import com.github.jasminb.jsonapi.annotations.Type;
+import com.github.jasminb.jsonapi.models.errors.Error;
+import com.github.jasminb.jsonapi.models.errors.ErrorResponse;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -401,10 +403,41 @@ public class ResourceConverter {
 								return;
 							}
 
-							if (isCollection(relationship)) {
-								relationshipField.set(object, readObjectCollectionInternal(resolver.resolve(link), type, resolverState));
+							byte[] content = resolver.resolve(link);
+
+							if (hasResourceLinkage(relationship)) {
+								if (isCollection(relationship)) {
+                                    relationshipField.set(object, readObjectCollectionInternal(content, type, resolverState));
+                                } else if (hasResourceLinkage(relationship)) {
+                                    relationshipField.set(object, readObjectInternal(content, type, resolverState));
+                                }
 							} else {
-								relationshipField.set(object, readObjectInternal(resolver.resolve(link), type, resolverState));
+								JsonNode resolvedNode = objectMapper.readTree(content);
+								if (ValidationUtils.isCollection(resolvedNode)) {
+									relationshipField.set(object, readObjectCollectionInternal(content, type, resolverState));
+								} else if (ValidationUtils.isObject(resolvedNode)) {
+									relationshipField.set(object, readObjectInternal(content, type, resolverState));
+								} else if (ErrorUtils.hasErrors(resolvedNode)){
+									ErrorResponse errors = ErrorUtils.parseError(resolvedNode);
+									StringBuilder msg = new StringBuilder("Unable to parse the response document for " +
+											"'" + link + "':");
+									msg.append("\n");
+									for (Error e : errors.getErrors()) {
+										if (e.getTitle() != null) {
+											msg.append(e.getTitle()).append(": ");
+										}
+										if (e.getCode() != null) {
+											msg.append("Error code: ").append(e.getCode()).append(" ");
+										}
+										if (e.getDetail() != null) {
+											msg.append("Detail: ").append(e.getDetail());
+										}
+									}
+									throw new RuntimeException(msg.toString());
+								} else {
+									throw new RuntimeException("Response document for '" + link + "' does not contain" +
+											" primary data.");
+								}
 							}
 						}
 					} else {
@@ -509,6 +542,10 @@ public class ResourceConverter {
 	private boolean isCollection(JsonNode source) {
 		JsonNode data = source.get(DATA);
 		return data != null && data.isArray();
+	}
+
+	private boolean hasResourceLinkage(JsonNode relationshipObj) {
+		return relationshipObj.has(DATA);
 	}
 
 

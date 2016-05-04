@@ -315,43 +315,8 @@ public class ResourceConverterTest {
 		Assert.assertTrue(articles.size() > 0);
 
 		// Assert relationships were resolved
-		Assert.assertEquals(1, resolver.resolved.get(authorRel).intValue());
-		Assert.assertEquals(1, resolver.resolved.get(commentRel).intValue());
+		Assert.assertEquals(1, resolver.getResolved().get(authorRel).intValue());
+		Assert.assertEquals(1, resolver.getResolved().get(commentRel).intValue());
 	}
 
-	/**
-	 * Simple global RelationshipResolver implementation that maintains a count of responses for each
-	 * relationship url.
-	 */
-	private class ProbeResolver implements RelationshipResolver {
-
-		/**
-		 * Map of relationship urls to the response JSON
-		 */
-		private Map<String, String> responseMap;
-
-		/**
-		 * Map of relationship to a count of the times they have been resolved
-		 */
-		private Map<String, Integer> resolved = new HashMap<>();
-
-		ProbeResolver(Map<String, String> responseMap) {
-			this.responseMap = responseMap;
-		}
-
-		@Override
-		public byte[] resolve(String relationshipURL) {
-			if (responseMap.containsKey(relationshipURL)) {
-				if (resolved.containsKey(relationshipURL)) {
-					int count = resolved.get(relationshipURL);
-					resolved.put(relationshipURL, ++count);
-				} else {
-					resolved.put(relationshipURL, 1);
-				}
-				return responseMap.get(relationshipURL).getBytes();
-			}
-			throw new IllegalArgumentException("Unable to resolve '" + relationshipURL + "', missing response map " +
-					"entry.");
-		}
-	}
 }

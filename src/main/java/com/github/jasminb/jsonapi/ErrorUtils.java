@@ -45,4 +45,15 @@ public class ErrorUtils {
 		return MAPPER.treeToValue(errorResponse, ErrorResponse.class);
 	}
 
+	/**
+	 * Returns {@code true} if the candidate node contains an 'errors' member.  Nodes that contain an 'errors' member
+	 * may be processed by the {@code ErrorUtils} class.
+	 *
+	 * @param candidate a {@code JsonNode} that may or may not contain an 'errors' member.
+	 * @return true if the candidate node contains an 'errors' member, false otherwise.
+     */
+	public static boolean hasErrors(JsonNode candidate) {
+		return candidate != null && candidate.has(JSONAPISpecConstants.ERRORS);
+	}
+
 }

@@ -1,3 +1,11 @@
+#### develop-wip Fork
+This branch (`develop-wip`) contains features not yet merged into the [upstream develop branch](https://github.com/jasminb/jsonapi-converter). Specifically it contains bug fixes for:
+
+ * detecting and preventing recursions while resolving relationships (#28)
+ * correctly parsing `to-many` and `to-one` responses while resolving relationships (#30)
+
+The instructions for building this branch are the same as the upstream, and are documented below.
+
 #### jsonapi-converter
 JSONAPI-Converter is a library that provides means for integrating with services using JSON API specification.
 

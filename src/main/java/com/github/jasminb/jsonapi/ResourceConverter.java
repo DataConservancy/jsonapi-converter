@@ -364,6 +364,18 @@ public class ResourceConverter {
 						if (linkNode != null) {
 							link = getLink(linkNode);
 
+							if (FIELD_RELATIONSHIP_MAP.get(relationshipField).strategy() == ResolutionStrategy.REF) {
+								if (String.class.isAssignableFrom(relationshipField.getType())) {
+									relationshipField.set(object, link);
+									continue;
+								}
+
+								throw new IllegalArgumentException("Reference resolution strategy requires String " +
+										"type, but " + relationshipField.getDeclaringClass().getName() + "#" +
+										relationshipField.getName() + " has type " +
+										relationshipField.getType().getName());
+							}
+
 							if (isCollection(relationship)) {
 								relationshipField.set(object, readObjectCollection(resolver.resolve(link), type));
 							} else {

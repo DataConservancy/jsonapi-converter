@@ -1,8 +1,9 @@
 #### develop-wip Fork
 This branch (`develop-wip`) contains features not yet merged into the [upstream develop branch](https://github.com/jasminb/jsonapi-converter). Specifically it contains bug fixes for:
 
- * detecting and preventing recursions while resolving relationships (#28)
- * correctly parsing `to-many` and `to-one` responses while resolving relationships (#30)
+ * detecting and preventing recursions while resolving relationships ([#28](https://github.com/jasminb/jsonapi-converter/issues/28))
+ * correctly parsing `to-many` and `to-one` responses while resolving relationships ([#30](https://github.com/jasminb/jsonapi-converter/issues/30))
+ * supports storing relationship urls as string references ([#31](https://github.com/jasminb/jsonapi-converter/issues/31))
 
 The instructions for building this branch are the same as the upstream, and are documented below.
 

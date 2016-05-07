@@ -12,6 +12,7 @@ import com.github.jasminb.jsonapi.annotations.Relationship;
 import com.github.jasminb.jsonapi.annotations.Type;
 import com.github.jasminb.jsonapi.models.errors.Error;
 import com.github.jasminb.jsonapi.models.errors.ErrorResponse;
+import retrofit.http.HEAD;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -398,6 +399,18 @@ public class ResourceConverter {
 
 						if (linkNode != null) {
 							link = getLink(linkNode);
+
+							if (FIELD_RELATIONSHIP_MAP.get(relationshipField).strategy() == ResolutionStrategy.REF) {
+								if (String.class.isAssignableFrom(relationshipField.getType())) {
+									relationshipField.set(object, link);
+									continue;
+								}
+
+								throw new IllegalArgumentException("Reference resolution strategy requires String " +
+										"type, but " + relationshipField.getDeclaringClass().getName() + "#" +
+										relationshipField.getName() + " has type " +
+										relationshipField.getType().getName());
+							}
 
 							if (resolverState.visited(link)) {
 								return;

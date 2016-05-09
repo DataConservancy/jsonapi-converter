@@ -5,6 +5,32 @@ This branch (`develop-wip`) contains features not yet merged into the [upstream 
  * correctly parsing `to-many` and `to-one` responses while resolving relationships ([#30](https://github.com/jasminb/jsonapi-converter/issues/30))
  * supports storing relationship urls as string references ([#31](https://github.com/jasminb/jsonapi-converter/issues/31))
 
+    @Types("node")
+    class Node {
+    
+      @Id
+      String id;
+    
+      @Relationship(value = "children", resolve = true, relType = RelType.RELATED, strategy = ResolutionStrategy.REF)
+      String childrenRel;
+    
+      // ...
+    }
+
+ * supports the modeling of JSON-API "links" objects using the new `Link` annotation
+
+    @Types("node")
+    class Node {
+    
+      @Id
+      String id;
+    
+      @Link
+      Map<String, ?> links;
+    
+      // ...
+    }
+   
 The instructions for building this branch are the same as the upstream, and are documented below.
 
 #### jsonapi-converter

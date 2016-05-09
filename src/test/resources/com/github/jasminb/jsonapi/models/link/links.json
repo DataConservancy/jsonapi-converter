@@ -1,0 +1,12 @@
+{
+  "data": [
+    {
+      "links": {
+        "foo": "bar",
+        "baz": "biz"
+      },
+      "type": "node",
+      "id": "ts6h8"
+    }
+  ]
+}

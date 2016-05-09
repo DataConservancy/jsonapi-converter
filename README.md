@@ -4,7 +4,7 @@ This branch (`develop-wip`) contains features not yet merged into the [upstream 
  * detecting and preventing recursions while resolving relationships ([#28](https://github.com/jasminb/jsonapi-converter/issues/28))
  * correctly parsing `to-many` and `to-one` responses while resolving relationships ([#30](https://github.com/jasminb/jsonapi-converter/issues/30))
  * supports storing relationship urls as string references ([#31](https://github.com/jasminb/jsonapi-converter/issues/31))
-
+<pre>
     @Types("node")
     class Node {
     
@@ -16,9 +16,9 @@ This branch (`develop-wip`) contains features not yet merged into the [upstream 
     
       // ...
     }
-
+</pre>
  * supports the modeling of JSON-API "links" objects using the new `Link` annotation
-
+<pre>
     @Types("node")
     class Node {
     
@@ -30,7 +30,7 @@ This branch (`develop-wip`) contains features not yet merged into the [upstream 
     
       // ...
     }
-   
+</pre>   
 The instructions for building this branch are the same as the upstream, and are documented below.
 
 #### jsonapi-converter

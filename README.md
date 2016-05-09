@@ -26,7 +26,7 @@ This branch (`develop-wip`) contains features not yet merged into the [upstream 
       String id;
     
       @Link
-      Map<String, ?> links;
+      Map&lt;String, ?&gt; links;
     
       // ...
     }

@@ -1,0 +1,22 @@
+{
+  "data": [
+    {
+      "links": {
+        "foo": {
+          "href": "bar",
+          "meta": {
+            "count": 10
+          }
+        },
+        "baz": {
+          "href": "biz",
+          "meta": {
+            "count": 8
+          }
+        }
+      },
+      "type": "node",
+      "id": "ts6h8"
+    }
+  ]
+}

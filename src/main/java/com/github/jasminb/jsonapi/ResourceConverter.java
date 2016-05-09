@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.jasminb.jsonapi.annotations.Id;
+import com.github.jasminb.jsonapi.annotations.Link;
 import com.github.jasminb.jsonapi.annotations.Meta;
 import com.github.jasminb.jsonapi.annotations.Relationship;
 import com.github.jasminb.jsonapi.annotations.Type;
@@ -39,6 +40,7 @@ public class ResourceConverter {
 	private static final Map<Class<?>, Map<String, Class<?>>> RELATIONSHIP_TYPE_MAP = new HashMap<>();
 	private static final Map<Class<?>, Map<String, Field>> RELATIONSHIP_FIELD_MAP = new HashMap<>();
 	private static final Map<Field, Relationship> FIELD_RELATIONSHIP_MAP = new HashMap<>();
+	private static final Map<Class<?>, Field> LINK_FIELD = new HashMap<>();
 	private static final Map<Class<?>, Class<?>> META_TYPE_MAP = new HashMap<>();
 	private static final Map<Class<?>, Field> META_FIELD = new HashMap<>();
 
@@ -110,6 +112,18 @@ public class ResourceConverter {
 					Class<?> metaType = ReflectionUtils.getFieldType(metaField);
 					META_TYPE_MAP.put(clazz, metaType);
 					META_FIELD.put(clazz, metaField);
+				}
+
+				// link fields
+				List<Field> linkFields = ReflectionUtils.getAnnotatedFields(clazz, Link.class, true);
+				if (linkFields.size() > 1) {
+					throw new IllegalArgumentException(String.format("Only one link field is allowed for type '%s'",
+							clazz.getCanonicalName()));
+				}
+				if (linkFields.size() == 1) {
+					Field linkField = linkFields.get(0);
+					linkField.setAccessible(true);
+					LINK_FIELD.put(clazz, linkField);
 				}
 			} else {
 				throw new IllegalArgumentException("All resource classes must be annotated with Type annotation!");
@@ -274,6 +288,11 @@ public class ResourceConverter {
 			result = objectMapper.treeToValue(source.get(ATTRIBUTES), clazz);
 		} else {
 			result = clazz.newInstance();
+		}
+
+		if (LINK_FIELD.containsKey(clazz) && source.has(LINKS)) {
+			Object linkObj = objectMapper.treeToValue(source.get(LINKS), LINK_FIELD.get(clazz).getType());
+			LINK_FIELD.get(clazz).set(result, linkObj);
 		}
 
 		// Set object id

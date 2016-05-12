@@ -3,6 +3,7 @@ package com.github.jasminb.jsonapi.models.link;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.github.jasminb.jsonapi.ResourceConverter;
+import com.github.jasminb.jsonapi.annotations.Links;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -10,14 +11,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Insures that fields annotated with {@link com.github.jasminb.jsonapi.annotations.Link} are properly mapped from the JSON serialization to
- * their Java representation.
+ * Insures that fields annotated with {@link Links} are properly mapped from the JSON serialization to their
+ * Java representation.
  */
 public class LinksTest {
 
     /**
-     * Insures that the modeler can use a custom domain object - {@link NodeLinksAsDomainObject.NodeLinks} - to model a links object in
-     * primary data.
+     * Insures that the modeler can use a custom domain object - {@link NodeLinksAsDomainObject.NodeLinks} - to model a
+     * links object in primary data.
      * <pre>
      * {
      *   "data": [{
@@ -30,8 +31,8 @@ public class LinksTest {
      *   }]
      * }
      * </pre>
-     * In this sample JSON, the links are simple strings.  The primary data domain object - {@link NodeLinksAsDomainObject} - stores
-     * these links as an instance of {@code NodeLinks}.
+     * In this sample JSON, the links are simple strings.  The primary data domain object -
+     * {@link NodeLinksAsDomainObject} - stores these links as an instance of {@code NodeLinks}.
      *
      * @throws Exception
      */
@@ -70,8 +71,9 @@ public class LinksTest {
      *   }]
      * }
      * </pre>
-     * In this sample JSON, the links are simple strings.  The primary data domain object - {@link NodeLinksAsMap} - stores
-     * these links in a {@code Map}, keyed by link type ("foo", "baz").  The values in the map are simple strings containing the URL.
+     * In this sample JSON, the links are simple strings.  The primary data domain object - {@link NodeLinksAsMap} -
+     * stores these links in a {@code Map}, keyed by link type ("foo", "baz").  The values in the map are simple strings
+     * containing the URL.
      *
      * @throws Exception
      */
@@ -180,7 +182,7 @@ public class LinksTest {
 //    }
 
     /**
-     * Insures that primary types contain at most one field annotated with {@code Link}.
+     * Insures that primary types contain at most one field annotated with {@code Links}.
      *
      * @throws Exception
      */

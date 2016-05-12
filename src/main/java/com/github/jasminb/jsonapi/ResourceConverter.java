@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.jasminb.jsonapi.annotations.Id;
-import com.github.jasminb.jsonapi.annotations.Link;
+import com.github.jasminb.jsonapi.annotations.Links;
 import com.github.jasminb.jsonapi.annotations.Meta;
 import com.github.jasminb.jsonapi.annotations.Relationship;
 import com.github.jasminb.jsonapi.annotations.Type;
@@ -115,7 +115,7 @@ public class ResourceConverter {
 				}
 
 				// link fields
-				List<Field> linkFields = ReflectionUtils.getAnnotatedFields(clazz, Link.class, true);
+				List<Field> linkFields = ReflectionUtils.getAnnotatedFields(clazz, Links.class, true);
 				if (linkFields.size() > 1) {
 					throw new IllegalArgumentException(String.format("Only one link field is allowed for type '%s'",
 							clazz.getCanonicalName()));
@@ -290,10 +290,7 @@ public class ResourceConverter {
 			result = clazz.newInstance();
 		}
 
-		if (LINK_FIELD.containsKey(clazz) && source.has(LINKS)) {
-			Object linkObj = objectMapper.treeToValue(source.get(LINKS), LINK_FIELD.get(clazz).getType());
-			LINK_FIELD.get(clazz).set(result, linkObj);
-		}
+		mapAndSetLinks(source, result);
 
 		// Set object id
 		setIdValue(result, source.get(ID));
@@ -308,6 +305,27 @@ public class ResourceConverter {
 
 
 		return result;
+	}
+
+	/**
+	 * If the JSON {@code source} contains a "links" object and the {@code target} has a {@link Links} annotated field,
+	 * map the JSON "links" object to a Java object, and set it on the annotated field of the {@code target}.  If the
+	 * {@code source} does not have a "links" object, or if the {@code target} does not have a {@code Links} annotated
+	 * field, this method does nothing.
+	 *
+	 * @param source the {@code JsonNode} that may or may not contain a "links" object
+	 * @param target the Java object that may or may not have a {@code Links} annotation
+	 * @param <T> the target type
+	 * @throws JsonProcessingException
+	 * @throws IllegalAccessException
+     */
+	private <T> void mapAndSetLinks(JsonNode source, T target) throws JsonProcessingException,
+			IllegalAccessException {
+		Class<?> targetClass = target.getClass();
+		if (LINK_FIELD.containsKey(targetClass) && source.has(LINKS)) {
+			Object linkObj = objectMapper.treeToValue(source.get(LINKS), LINK_FIELD.get(targetClass).getType());
+			LINK_FIELD.get(targetClass).set(target, linkObj);
+		}
 	}
 
 

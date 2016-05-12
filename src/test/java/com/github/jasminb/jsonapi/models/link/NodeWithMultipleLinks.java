@@ -1,13 +1,13 @@
 package com.github.jasminb.jsonapi.models.link;
 
 import com.github.jasminb.jsonapi.annotations.Id;
-import com.github.jasminb.jsonapi.annotations.Link;
+import com.github.jasminb.jsonapi.annotations.Links;
 import com.github.jasminb.jsonapi.annotations.Type;
 
 import java.util.Map;
 
 /**
- * Class that contains multiple fields annotated with {@code Link}, which is not allowed.
+ * Class that contains multiple fields annotated with {@code Links}, which is not allowed.
  */
 @Type("node")
 public class NodeWithMultipleLinks {
@@ -15,10 +15,10 @@ public class NodeWithMultipleLinks {
     @Id
     private String id;
 
-    @Link
+    @Links
     private Map<String, String> links;
 
-    @Link
+    @Links
     private Map<String, String> anotherLinkObject;
 
     public String getId() {

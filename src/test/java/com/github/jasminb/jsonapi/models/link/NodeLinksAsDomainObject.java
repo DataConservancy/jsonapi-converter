@@ -1,7 +1,7 @@
 package com.github.jasminb.jsonapi.models.link;
 
 import com.github.jasminb.jsonapi.annotations.Id;
-import com.github.jasminb.jsonapi.annotations.Link;
+import com.github.jasminb.jsonapi.annotations.Links;
 import com.github.jasminb.jsonapi.annotations.Type;
 
 /**
@@ -13,7 +13,7 @@ public class NodeLinksAsDomainObject {
     @Id
     private String id;
 
-    @Link
+    @Links
     private NodeLinks links;
 
     public String getId() {

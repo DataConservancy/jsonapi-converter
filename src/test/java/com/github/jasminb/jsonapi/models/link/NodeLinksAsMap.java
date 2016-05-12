@@ -1,7 +1,7 @@
 package com.github.jasminb.jsonapi.models.link;
 
 import com.github.jasminb.jsonapi.annotations.Id;
-import com.github.jasminb.jsonapi.annotations.Link;
+import com.github.jasminb.jsonapi.annotations.Links;
 import com.github.jasminb.jsonapi.annotations.Type;
 
 import java.util.Map;
@@ -41,7 +41,7 @@ public class NodeLinksAsMap {
     @Id
     private String id;
 
-    @Link
+    @Links
     private Map<String, ?> links;
 
     public String getId() {

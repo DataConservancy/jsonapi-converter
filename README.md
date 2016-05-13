@@ -1,9 +1,9 @@
 #### develop-wip Fork
 This branch (`develop-wip`) contains features not yet merged into the [upstream develop branch](https://github.com/jasminb/jsonapi-converter). Specifically it contains bug fixes for:
 
- * detecting and preventing recursions while resolving relationships ([#28](https://github.com/jasminb/jsonapi-converter/issues/28))
- * correctly parsing `to-many` and `to-one` responses while resolving relationships ([#30](https://github.com/jasminb/jsonapi-converter/issues/30))
- * supports storing relationship urls as string references ([#31](https://github.com/jasminb/jsonapi-converter/issues/31))
+  * detecting and preventing recursions while resolving relationships ([#28](https://github.com/jasminb/jsonapi-converter/issues/28))
+  * correctly parsing `to-many` and `to-one` responses while resolving relationships ([#30](https://github.com/jasminb/jsonapi-converter/issues/30))
+  * supports storing relationship urls as string references ([#31](https://github.com/jasminb/jsonapi-converter/issues/31))
 <pre>
     @Types("node")
     class Node {
@@ -17,7 +17,7 @@ This branch (`develop-wip`) contains features not yet merged into the [upstream 
       // ...
     }
 </pre>
- * supports the modeling of JSON-API "links" objects using the new `Link` annotation
+  * supports the modeling of JSON-API "links" objects using the new `Links` annotation
 <pre>
     @Types("node")
     class Node {
@@ -25,12 +25,14 @@ This branch (`develop-wip`) contains features not yet merged into the [upstream 
       @Id
       String id;
     
-      @Link
+      @Links
       Map&lt;String, ?&gt; links;
     
       // ...
     }
-</pre>   
+</pre>
+  * Collections now expose pagination and meta information via `ResourceList` class
+   
 The instructions for building this branch are the same as the upstream, and are documented below.
 
 #### jsonapi-converter

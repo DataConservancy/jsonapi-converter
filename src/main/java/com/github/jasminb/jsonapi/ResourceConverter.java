@@ -602,7 +602,7 @@ public class ResourceConverter {
 			// object form
 			return linkNode.get(HREF).asText();
 		}
-		return linkNode.asText();
+		return linkNode.asText(null);
 	}
 
 	/**

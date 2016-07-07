@@ -6,7 +6,7 @@ This fork contains features not yet merged into the [upstream develop branch](ht
   * correctly parsing `to-many` and `to-one` responses while resolving relationships ([#30](https://github.com/jasminb/jsonapi-converter/issues/30))
   * supports storing relationship urls as string references ([#31](https://github.com/jasminb/jsonapi-converter/issues/31))
 
-It is released under the Maven groupId:artifactId `org.dataconservancy:jsonapi-converter`
+It is released under the Maven groupId:artifactId `org.dataconservancy.jasminb:jsonapi-converter`
 
 #### Custom Release Process
 

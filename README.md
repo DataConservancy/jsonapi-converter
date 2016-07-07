@@ -1,9 +1,24 @@
-#### develop-wip Fork
-This branch (`develop-wip`) contains features not yet merged into the [upstream develop branch](https://github.com/jasminb/jsonapi-converter). Specifically it contains bug fixes for:
+#### Custom Fork
+
+This fork contains features not yet merged into the [upstream develop branch](https://github.com/jasminb/jsonapi-converter). Specifically it contains bug fixes for:
 
   * detecting and preventing recursions while resolving relationships ([#28](https://github.com/jasminb/jsonapi-converter/issues/28))
   * correctly parsing `to-many` and `to-one` responses while resolving relationships ([#30](https://github.com/jasminb/jsonapi-converter/issues/30))
   * supports storing relationship urls as string references ([#31](https://github.com/jasminb/jsonapi-converter/issues/31))
+
+It is released under the Maven groupId:artifactId `org.dataconservancy:jsonapi-converter`
+
+#### Custom Release Process
+
+To make a release, have a clean working copy.  Run (substituting the proper versions in):
+
+  * `mvn release:prepare -DpushChanges=false -Dtag=dataconservancy-local-release-0.3 -DreleaseVersion=0.3 -DdevelopmentVersion=0.4-SNAPSHOT -Dresume=false`
+  * `mvn -e release:perform -Dgoals=deploy -DlocalCheckout=true`
+
+If the git logs look good after performing the release, push the changes to `origin`.
+
+
+### Examples
 
 <pre>
     @Types("node")

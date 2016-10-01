@@ -466,23 +466,35 @@ public class ResourceConverter {
 							}
 
 							if (resolverState.visited(link)) {
-								return;
+								if (resolverState.isCached(link)) {
+									relationshipField.set(object, resolverState.retrieve(link));
+								}
+								continue;
 							}
 
 							byte[] content = resolver.resolve(link);
 
 							if (hasResourceLinkage(relationship)) {
+								Object resolvedObject = null;
 								if (isCollection(relationship)) {
-                                    relationshipField.set(object, readObjectCollectionInternal(content, type, resolverState));
-                                } else if (hasResourceLinkage(relationship)) {
-                                    relationshipField.set(object, readObjectInternal(content, type, resolverState));
-                                }
+									resolvedObject = readObjectCollectionInternal(content, type, resolverState);
+									relationshipField.set(object, resolvedObject);
+								} else if (hasResourceLinkage(relationship)) {
+									resolvedObject = readObjectInternal(content, type, resolverState);
+									relationshipField.set(object, resolvedObject);
+								}
+								if (resolvedObject != null) {
+									resolverState.cache(link, resolvedObject);
+								}
 							} else {
 								JsonNode resolvedNode = objectMapper.readTree(content);
+								Object resolvedObject = null;
 								if (ValidationUtils.isCollection(resolvedNode)) {
-									relationshipField.set(object, readObjectCollectionInternal(content, type, resolverState));
+									resolvedObject = readObjectCollectionInternal(content, type, resolverState);
+									relationshipField.set(object, resolvedObject);
 								} else if (ValidationUtils.isObject(resolvedNode)) {
-									relationshipField.set(object, readObjectInternal(content, type, resolverState));
+									resolvedObject = readObjectInternal(content, type, resolverState);
+									relationshipField.set(object, resolvedObject);
 								} else if (ErrorUtils.hasErrors(resolvedNode)){
 									ErrorResponse errors = ErrorUtils.parseError(resolvedNode);
 									StringBuilder msg = new StringBuilder("Unable to parse the response document for " +
@@ -503,6 +515,9 @@ public class ResourceConverter {
 								} else {
 									throw new RuntimeException("Response document for '" + link + "' does not contain" +
 											" primary data.");
+								}
+								if (resolvedObject != null) {
+									resolverState.cache(link, resolvedObject);
 								}
 							}
 						}

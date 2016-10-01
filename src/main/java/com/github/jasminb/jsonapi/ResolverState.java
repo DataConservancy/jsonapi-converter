@@ -1,7 +1,9 @@
 package com.github.jasminb.jsonapi;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -24,6 +26,11 @@ class ResolverState {
      * Maintains a set of urls that have been visited when resolving relationships
      */
     private final Set<String> visited = new HashSet<>();
+
+    /**
+     * Maintains a cache of objects that have been deserialized
+     */
+    private final Map<String, Object> cache = new HashMap<>();
 
     /**
      * Constructs a new state object.
@@ -56,6 +63,20 @@ class ResolverState {
     boolean visited(String url) {
         return !this.visited.add(url);
     }
+
+    Object cache(String url, Object object) {
+        cache.put(url, object);
+        return object;
+    }
+
+    boolean isCached(String url) {
+        return cache.containsKey(url);
+    }
+
+    Object retrieve(String url) {
+        return cache.get(url);
+    }
+
 
     /**
      * Used by the relationship resolution implementation to maintain the relationship type being resolved for this

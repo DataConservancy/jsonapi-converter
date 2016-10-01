@@ -1,0 +1,26 @@
+{
+  "data":
+    {
+      "relationships": {
+        "parent": {
+          "links": {
+            "self": {
+              "href": "http://example.com/node/1"
+            }
+          }
+        },
+        "node": {
+          "links": {
+            "self": {
+              "href": "http://example.com/node/1"
+            }
+          }
+        }
+      },
+      "attributes": {
+        "name": "foo"
+      },
+      "type": "node",
+      "id": "2"
+    }
+}

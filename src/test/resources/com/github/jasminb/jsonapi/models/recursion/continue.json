@@ -1,0 +1,33 @@
+{
+  "data":
+  {
+    "relationships": {
+      "parent": {
+        "links": {
+          "self": {
+            "href": "http://example.com/node/1"
+          }
+        }
+      },
+      "node": {
+        "links": {
+          "self": {
+            "href": "http://example.com/node/1"
+          }
+        }
+      },
+      "bizrel": {
+        "links": {
+          "self": {
+            "href": "http://www.google.com"
+          }
+        }
+      }
+    },
+    "attributes": {
+      "name": "bar"
+    },
+    "type": "bizrelnode",
+    "id": "3"
+  }
+}

@@ -583,10 +583,30 @@ public class ResourceConverter {
 		return resolvedObject;
 	}
 
-	private Object retrieveAndSetCollection(Object relSource, ResolverState resolverState, Field relField, Class<?> type, byte[] content) throws IllegalAccessException {
-		Object resolvedObject = readObjectCollectionInternal(content, type, resolverState);
-		relField.set(relSource, resolvedObject);
-		return resolvedObject;
+	/**
+	 * Unmarshals the supplied byte array to a Java collection (resolving any JSON-API relationships that are
+	 * present).  The unmarshaled collection is set on {@code targetObject}, using the {@code targetField}.
+	 *
+	 * @param targetObject the Java object that will have the unmarshaled object set on it
+	 * @param targetField the field of the target Java object that is being set
+	 * @param toUnmarshal the byte array being unmarshaled to a Java collection
+	 * @param unmarshaledType the byte array being unmarshaled to a Java object
+	 * @param resolverState contains state necessary for resolving relationships
+	 * @return the unmarshaled collection
+	 * @throws IllegalAccessException
+     */
+	private Object unmarshalAndSetCollection(Object targetObject, Field targetField, byte[] toUnmarshal,
+											 Class<?> unmarshaledType, ResolverState resolverState)
+			throws IllegalAccessException {
+		ResourceList supplier = readObjectCollectionInternal(toUnmarshal, unmarshaledType, resolverState);
+		List accumulator = new ArrayList();
+		accumulator.addAll(supplier);
+		while (supplier.getNext() != null) {
+			supplier = readObjectCollectionInternal(getResolver(unmarshaledType).resolve(supplier.getNext()), unmarshaledType, resolverState);
+			accumulator.addAll(supplier);
+		}
+		targetField.set(targetObject, accumulator);
+		return accumulator;
 	}
 
 	/**

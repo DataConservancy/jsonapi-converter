@@ -3,8 +3,6 @@ package com.github.jasminb.jsonapi;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -18,7 +16,6 @@ import com.github.jasminb.jsonapi.annotations.Relationship;
 import com.github.jasminb.jsonapi.annotations.Type;
 import com.github.jasminb.jsonapi.models.errors.Error;
 import com.github.jasminb.jsonapi.models.errors.ErrorResponse;
-import retrofit.http.HEAD;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -477,48 +474,31 @@ public class ResourceConverter {
 							if (hasResourceLinkage(relationship)) {
 								Object resolvedObject = null;
 								if (isCollection(relationship)) {
-									resolvedObject = readObjectCollectionInternal(content, type, resolverState);
-									relationshipField.set(object, resolvedObject);
+									resolvedObject = unmarshalAndSetCollection(
+											object, relationshipField, content, type, resolverState);
 								} else if (hasResourceLinkage(relationship)) {
-									resolvedObject = readObjectInternal(content, type, resolverState);
-									relationshipField.set(object, resolvedObject);
+									resolvedObject = unmarshalAndSetObject(
+											object, relationshipField, content, type, resolverState);
 								}
-								if (resolvedObject != null) {
-									resolverState.cache(link, resolvedObject);
-								}
+								cacheObject(resolverState, link, resolvedObject);
 							} else {
 								JsonNode resolvedNode = objectMapper.readTree(content);
 								Object resolvedObject = null;
 								if (ValidationUtils.isCollection(resolvedNode)) {
-									resolvedObject = readObjectCollectionInternal(content, type, resolverState);
-									relationshipField.set(object, resolvedObject);
+									resolvedObject = unmarshalAndSetCollection(
+											object, relationshipField, content, type, resolverState);
 								} else if (ValidationUtils.isObject(resolvedNode)) {
-									resolvedObject = readObjectInternal(content, type, resolverState);
-									relationshipField.set(object, resolvedObject);
+									resolvedObject = unmarshalAndSetObject(
+											object, relationshipField, content, type, resolverState);
 								} else if (ErrorUtils.hasErrors(resolvedNode)){
 									ErrorResponse errors = ErrorUtils.parseError(resolvedNode);
-									StringBuilder msg = new StringBuilder("Unable to parse the response document for " +
-											"'" + link + "':");
-									msg.append("\n");
-									for (Error e : errors.getErrors()) {
-										if (e.getTitle() != null) {
-											msg.append(e.getTitle()).append(": ");
-										}
-										if (e.getCode() != null) {
-											msg.append("Error code: ").append(e.getCode()).append(" ");
-										}
-										if (e.getDetail() != null) {
-											msg.append("Detail: ").append(e.getDetail());
-										}
-									}
+									StringBuilder msg = buildErrorResponse(link, errors);
 									throw new RuntimeException(msg.toString());
 								} else {
 									throw new RuntimeException("Response document for '" + link + "' does not contain" +
 											" primary data.");
 								}
-								if (resolvedObject != null) {
-									resolverState.cache(link, resolvedObject);
-								}
+								cacheObject(resolverState, link, resolvedObject);
 							}
 						}
 					} else {
@@ -543,6 +523,90 @@ public class ResourceConverter {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Builds an error message when a resolved relationship contains an {@code ErrorResponse}.
+	 *
+	 * @param link the link that was resolved, resulting in the {@code errors} response
+	 * @param errors the error response returned after resolving {@code link}
+     * @return a string representation of the error, useful for Java exception messages
+     */
+	private StringBuilder buildErrorResponse(String link, ErrorResponse errors) {
+		StringBuilder msg = new StringBuilder("Unable to parse the response document for " +
+                "'" + link + "':");
+		msg.append("\n");
+		for (Error e : errors.getErrors()) {
+            if (e.getTitle() != null) {
+                msg.append(e.getTitle()).append(": ");
+            }
+            if (e.getCode() != null) {
+                msg.append("Error code: ").append(e.getCode()).append(" ");
+            }
+            if (e.getDetail() != null) {
+                msg.append("Detail: ").append(e.getDetail());
+            }
+        }
+		return msg;
+	}
+
+	/**
+	 * Caches the response of retrieving the resource at {@code link}.
+	 *
+	 * @param resolverState contains the cache itself
+	 * @param link the resolved link
+	 * @param resolvedObject the object resolved at {@code link}, may be {@code null}
+     */
+	private void cacheObject(ResolverState resolverState, String link, Object resolvedObject) {
+		if (resolvedObject != null) {
+            resolverState.cache(link, resolvedObject);
+        }
+	}
+
+	/**
+	 * Unmarshals the supplied byte array to a Java object (resolving any JSON-API relationships that are
+	 * present).  The unmarshaled object is set on {@code targetObject}, using the {@code targetField}.
+	 *
+	 * @param targetObject the Java object that will have the unmarshaled object set on it
+	 * @param targetField the field of the target Java object that is being set
+	 * @param toUnmarshal the byte array being unmarshaled to a Java object
+	 * @param unmarshaledType the expected type of the unmarshaled object
+	 * @param resolverState contains state necessary for resolving relationships
+	 * @return the unmarshaled object
+	 * @throws IllegalAccessException
+     */
+	private Object unmarshalAndSetObject(Object targetObject, Field targetField, byte[] toUnmarshal,
+										 Class<?> unmarshaledType, ResolverState resolverState)
+			throws IllegalAccessException {
+		Object resolvedObject = readObjectInternal(toUnmarshal, unmarshaledType, resolverState);
+		targetField.set(targetObject, resolvedObject);
+		return resolvedObject;
+	}
+
+	/**
+	 * Unmarshals the supplied byte array to a Java collection (resolving any JSON-API relationships that are
+	 * present).  The unmarshaled collection is set on {@code targetObject}, using the {@code targetField}.
+	 *
+	 * @param targetObject the Java object that will have the unmarshaled object set on it
+	 * @param targetField the field of the target Java object that is being set
+	 * @param toUnmarshal the byte array being unmarshaled to a Java collection
+	 * @param unmarshaledType the byte array being unmarshaled to a Java object
+	 * @param resolverState contains state necessary for resolving relationships
+	 * @return the unmarshaled collection
+	 * @throws IllegalAccessException
+     */
+	private Object unmarshalAndSetCollection(Object targetObject, Field targetField, byte[] toUnmarshal,
+											 Class<?> unmarshaledType, ResolverState resolverState)
+			throws IllegalAccessException {
+		ResourceList supplier = readObjectCollectionInternal(toUnmarshal, unmarshaledType, resolverState);
+		List accumulator = new ArrayList();
+		accumulator.addAll(supplier);
+		while (supplier.getNext() != null) {
+			supplier = readObjectCollectionInternal(getResolver(unmarshaledType).resolve(supplier.getNext()), unmarshaledType, resolverState);
+			accumulator.addAll(supplier);
+		}
+		targetField.set(targetObject, accumulator);
+		return accumulator;
 	}
 
 	/**

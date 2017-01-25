@@ -599,14 +599,9 @@ public class ResourceConverter {
 											 Class<?> unmarshaledType, ResolverState resolverState)
 			throws IllegalAccessException {
 		ResourceList supplier = readObjectCollectionInternal(toUnmarshal, unmarshaledType, resolverState);
-		List accumulator = new ArrayList();
-		accumulator.addAll(supplier);
-		while (supplier.getNext() != null) {
-			supplier = readObjectCollectionInternal(getResolver(unmarshaledType).resolve(supplier.getNext()), unmarshaledType, resolverState);
-			accumulator.addAll(supplier);
-		}
-		targetField.set(targetObject, accumulator);
-		return accumulator;
+		final PaginatedResourceList<?> paginatedResult = new PaginatedResourceList<>(supplier, getResolver(unmarshaledType), this, unmarshaledType);
+		targetField.set(targetObject, paginatedResult);
+		return paginatedResult;
 	}
 
 	/**

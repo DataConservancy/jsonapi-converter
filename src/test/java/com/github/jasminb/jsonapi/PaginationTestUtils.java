@@ -16,8 +16,10 @@
 package com.github.jasminb.jsonapi;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Elliot Metsger (emetsger@jhu.edu)
@@ -94,9 +96,9 @@ public class PaginationTestUtils {
      */
     static class Meta<T> extends HashMap<String, T> {
 
-        private final int total;
+        private final Integer total;
 
-        private final int perPage;
+        private final Integer perPage;
 
         @SuppressWarnings("unchecked")
         public Meta(final Integer total, final Integer perPage) {
@@ -117,10 +119,14 @@ public class PaginationTestUtils {
     }
 
     static class Links extends HashMap<String, Link> {
-        private final Link first;
-        private final Link last;
-        private final Link next;
-        private final Link prev;
+        private Link first;
+        private Link last;
+        private Link next;
+        private Link prev;
+
+        public Links() {
+
+        }
 
         public Links(String first, String last, String next, String prev) {
             this.first = new Link(first);
@@ -159,6 +165,128 @@ public class PaginationTestUtils {
         public Link getPrev() {
             return prev;
         }
+
+        public void setFirst(Link first) {
+            this.first = first;
+            put(JSONAPISpecConstants.FIRST, this.first);
+        }
+
+        public void setLast(Link last) {
+            this.last = last;
+            put(JSONAPISpecConstants.LAST, this.last);
+        }
+
+        public void setNext(Link next) {
+            this.next = next;
+            put(JSONAPISpecConstants.NEXT, this.next);
+        }
+
+        public void setPrev(Link prev) {
+            this.prev = prev;
+            put(JSONAPISpecConstants.PREV, this.prev);
+        }
     }
 
+    static class ResourceListBuilder<T> {
+        private LinksBuilder<T> linksBuilder;
+        private MetaBuilder<T> metaBuilder;
+        private ResourceList<T> list;
+        private Links links;
+        private Map<String, Object> meta;
+
+        ResourceListBuilder() {
+            linksBuilder = new LinksBuilder<>();
+            metaBuilder = new MetaBuilder<>();
+        }
+
+        ResourceListBuilder<T> wrap(List<T> toWrap) {
+            this.list = new ResourceList<>(toWrap);
+            return this;
+        }
+
+        LinksBuilder<T> withLinks() {
+            if (list == null) {
+                throw new IllegalStateException("Must call wrap(...) first.");
+            }
+            return linksBuilder.newBuilder(this);
+        }
+
+        MetaBuilder<T> withMeta() {
+            if (list == null) {
+                throw new IllegalStateException("Must call wrap(...) first.");
+            }
+            return metaBuilder.newBuilder(this);
+        }
+
+        ResourceList<T> finish() {
+            if (links != null) {
+                this.list.setLinks(links);
+            }
+            if (meta != null) {
+                this.list.setMeta(meta);
+            }
+            return this.list;
+        }
+    }
+
+    static class LinksBuilder<T> {
+        private ResourceListBuilder<T> listBuilder;
+
+        LinksBuilder<T> newBuilder(ResourceListBuilder<T> listBuilder) {
+            this.listBuilder = listBuilder;
+            this.listBuilder.links = new Links();
+            return this;
+        }
+
+        LinksBuilder<T> addNext(String href) {
+            this.listBuilder.links.setNext(new Link(href));
+            return this;
+        }
+
+        LinksBuilder<T> addPrev(String href) {
+            this.listBuilder.links.setPrev(new Link(href));
+            return this;
+        }
+
+        LinksBuilder<T> addFirst(String href) {
+            this.listBuilder.links.setFirst(new Link(href));
+            return this;
+        }
+
+        LinksBuilder<T> addLast(String href) {
+            this.listBuilder.links.setLast(new Link(href));
+            return this;
+        }
+
+        ResourceListBuilder<T> and() {
+            return listBuilder;
+        }
+
+        ResourceList<T> finish() {
+            return listBuilder.finish();
+        }
+    }
+
+    static class MetaBuilder<T> {
+        private ResourceListBuilder<T> listBuilder;
+
+        MetaBuilder<T> newBuilder(ResourceListBuilder<T> listBuilder) {
+            this.listBuilder = listBuilder;
+            this.listBuilder.meta = new HashMap<>();
+            return this;
+        }
+
+        MetaBuilder<T> add(String key, Object value) {
+            this.listBuilder.meta.put(key, value);
+            return this;
+        }
+
+        ResourceListBuilder<T> and() {
+            return listBuilder;
+        }
+
+        ResourceList<T> finish() {
+            return listBuilder.finish();
+        }
+    }
 }

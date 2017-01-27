@@ -63,6 +63,13 @@ public class PaginatedResourceList<E> implements List<E> {
 
     public int total() {
         if (resources.getMeta() != null && resources.getMeta().get("total") != null) {
+
+            // If there is a total, but there is no "next" link, then pagination is not possible, so it is proper
+            // to return the size of resource list
+            if (resources.getNext() == null) {
+                return resources.size();
+            }
+
             try {
                 return (Integer) resources.getMeta().get("total");
             } catch (Exception e) {
@@ -94,7 +101,7 @@ public class PaginatedResourceList<E> implements List<E> {
 
     @Override
     public Iterator<E> iterator() {
-        return new PagingIterator<E>(resolver, converter, resources, type);
+        return new PagingIterator<>(resolver, converter, resources, type);
     }
 
     /**

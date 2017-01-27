@@ -15,6 +15,7 @@
  */
 package com.github.jasminb.jsonapi;
 
+import com.github.jasminb.jsonapi.PaginationTestUtils.Links;
 import com.github.jasminb.jsonapi.PaginationTestUtils.Meta;
 import com.github.jasminb.jsonapi.PaginationTestUtils.TestResource;
 import org.junit.Test;
@@ -27,6 +28,9 @@ import static com.github.jasminb.jsonapi.PaginationTestUtils.ofIds;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyByte;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -47,7 +51,7 @@ public class PaginatedResourceListTest {
 
     private final Class<TestResource> clazz = TestResource.class;
 
-    final PaginatedResourceList<TestResource> underTest = new PaginatedResourceList(resources, resolver, converter, clazz);
+    PaginatedResourceList<TestResource> underTest = new PaginatedResourceList(resources, resolver, converter, clazz);
 
     @Test
     public void testTotalAndPerPage() throws Exception {
@@ -61,16 +65,38 @@ public class PaginatedResourceListTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testNoTotalWithNextPage() throws Exception {
-        when(resources.getMeta()).thenReturn(null);
-        when(resources.getNext()).thenReturn("");
+        // Three pages in the collection, of one result per page.
+        ResourceList page_1 = new ResourceList<>(ofIds("1"));
+        ResourceList page_2 = new ResourceList<>(ofIds("2"));
+        ResourceList page_3 = new ResourceList<>(ofIds("3"));
+
+        // Mocks a response that does not have a known total collection size, but has one result per page
+        page_1.setMeta(new Meta<>(-1, 1));
+
+        // Set the 'next' of page_1 to page_2, and page_2 to page_3
+        page_1.setLinks(new Links(null, null, "page 2", null));
+        page_2.setLinks(new Links(null, null, "page 3", null));
+
+        // Mock the resolver's response
+        when(resolver.resolve("page 2")).thenReturn("page 2".getBytes());
+        when(resolver.resolve("page 3")).thenReturn("page 3".getBytes());
+
+        when(converter.readObjectCollection(eq("page 2".getBytes()), any())).thenReturn(page_2);
+        when(converter.readObjectCollection(eq("page 3".getBytes()), any())).thenReturn(page_3);
+
+
+        underTest = new PaginatedResourceList(page_1, resolver, converter, clazz);
+
 
         // The collection can be paginated still (e.g. stream() will still work) but the collection is of unknown size
         assertEquals(-1, underTest.total());
-        assertEquals(-1, underTest.perPage());
+        assertEquals(1, underTest.perPage());
+        assertEquals(3, underTest.stream().count());
 
-        verify(resources, atLeastOnce()).getMeta();
-        verify(resources, atLeastOnce()).getNext();
+        verify(resolver, times(2)).resolve(any());
+        verify(converter, times(2)).readObjectCollection(new byte[anyByte()], any());
     }
 
     @Test

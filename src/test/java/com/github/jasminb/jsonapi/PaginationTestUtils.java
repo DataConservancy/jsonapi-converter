@@ -78,6 +78,13 @@ public class PaginationTestUtils {
         public int hashCode() {
             return id != null ? id.hashCode() : 0;
         }
+
+        @Override
+        public String toString() {
+            return "TestResource{" +
+                    "id='" + id + '\'' +
+                    '}';
+        }
     }
 
     /**
@@ -106,6 +113,51 @@ public class PaginationTestUtils {
 
         public int getPerPage() {
             return perPage;
+        }
+    }
+
+    static class Links extends HashMap<String, Link> {
+        private final Link first;
+        private final Link last;
+        private final Link next;
+        private final Link prev;
+
+        public Links(String first, String last, String next, String prev) {
+            this.first = new Link(first);
+            this.last = new Link(last);
+            this.next = new Link(next);
+            this.prev = new Link(prev);
+            put(JSONAPISpecConstants.FIRST, this.first);
+            put(JSONAPISpecConstants.LAST, this.last);
+            put(JSONAPISpecConstants.NEXT, this.next);
+            put(JSONAPISpecConstants.PREV, this.prev);
+        }
+
+        public Links(Link first, Link last, Link next, Link prev) {
+            this.first = first;
+            this.last = last;
+            this.next = next;
+            this.prev = prev;
+            put(JSONAPISpecConstants.FIRST, this.first);
+            put(JSONAPISpecConstants.LAST, this.last);
+            put(JSONAPISpecConstants.NEXT, this.next);
+            put(JSONAPISpecConstants.PREV, this.prev);
+        }
+
+        public Link getFirst() {
+            return first;
+        }
+
+        public Link getLast() {
+            return last;
+        }
+
+        public Link getNext() {
+            return next;
+        }
+
+        public Link getPrev() {
+            return prev;
         }
     }
 

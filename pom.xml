@@ -83,6 +83,7 @@
                 <configuration>
                     <pushChanges>false</pushChanges>
                     <localCheckout>true</localCheckout>
+                    <goals>deploy</goals>
                 </configuration>
 			</plugin>
 			<plugin>

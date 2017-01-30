@@ -10,7 +10,7 @@
 
 	<groupId>org.dataconservancy.jasminb</groupId>
 	<artifactId>jsonapi-converter</artifactId>
-	<version>0.5-SNAPSHOT</version>
+	<version>0.5</version>
 
 	<name>JSONAPI Converter</name>
 	<description>JSONAPI-Converter is a library that provides means for integrating with services using JSON API specification.  This is a custom fork of the converter which contains features not found in the mainline code.</description>
@@ -144,7 +144,7 @@
 		<connection>scm:git:https://github.com/DataConservancy/jsonapi-converter.git</connection>
         <developerConnection>scm:git:https://github.com/DataConservancy/jsonapi-converter.git</developerConnection>
 		<url>https://github.com/DataConservancy/jsonapi-converter</url>
-        <tag>HEAD</tag>
+        <tag>dataconservancy-local-release-0.5</tag>
 	</scm>
 
 	<developers>

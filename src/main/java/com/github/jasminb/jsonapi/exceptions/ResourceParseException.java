@@ -3,9 +3,11 @@ package com.github.jasminb.jsonapi.exceptions;
 import com.github.jasminb.jsonapi.models.errors.ErrorResponse;
 
 /**
- * ResourceParseException implementation. <br />
+ * ResourceParseException implementation.
+ * <p>
  * This exception is thrown from ResourceConverter in case parsed body contains 'errors' node.
- *
+ * </p>
+ * 
  * @author jbegic
  */
 public class ResourceParseException extends RuntimeException {

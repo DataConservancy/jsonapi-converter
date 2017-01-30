@@ -1,9 +1,11 @@
 package com.github.jasminb.jsonapi;
 
 /**
- * Relationship resolver contract. <br/>
+ * Relationship resolver contract.
+ * <p>
  * Implementors of this class should provide means for invoking API using relationship URL without any
  * context awareness. Usually relationship should be resolved by simply invoking HTTP GET using provided URL.
+ * </p>
  *
  * @author jbegic
  */

@@ -28,9 +28,10 @@ import java.util.Map;
 import static com.github.jasminb.jsonapi.JSONAPISpecConstants.*;
 
 /**
- * JSON API data converter. <br />
- *
+ * JSON API data converter.
+ * <p>
  * Provides methods for conversion between JSON API resources to java POJOs and vice versa.
+ * </p>
  *
  * @author jbegic
  */
@@ -145,8 +146,10 @@ public class ResourceConverter {
 	/**
 	 * Registers global relationship resolver. This resolver will be used in case relationship is present in the
 	 * API response but not provided in the <code>included</code> section and relationship resolving is enabled
-	 * trough relationship annotation. <br/>
+	 * through relationship annotation.
+	 * <p>
 	 * In case type resolver is registered it will be used instead.
+	 * </p>
 	 * @param resolver resolver instance
 	 */
 	public void setGlobalResolver(RelationshipResolver resolver) {
